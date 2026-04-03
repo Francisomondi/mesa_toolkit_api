@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import { generateToken } from "../utils/generateToken.js";
+import { generateApiKey } from "../utils/generateApiKey.js";
 
 export const registerUser = async (req, res) => {
   
@@ -16,12 +17,14 @@ export const registerUser = async (req, res) => {
     const user = await User.create({
       name,
       email,    
-        password: hashedPassword
+      password: hashedPassword,
+      apiKey: generateApiKey(),
     });
     res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
+      apiKey: user.apiKey,
       token: generateToken(user._id)
     });
   } catch (error) {
@@ -51,3 +54,11 @@ export const loginUser = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 }
+
+
+export const getProfile = async (req, res) => {
+  return res.json({
+    message: "Profile fetched successfully",
+    user: req.user,
+  });
+};
