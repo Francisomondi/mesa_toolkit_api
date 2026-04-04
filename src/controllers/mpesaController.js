@@ -1,3 +1,4 @@
+import Transaction from "../models/Transaction.js";
 import { stkPush } from "../utils/mpesa.js";
 
 export const stkPushController = async (req, res) => {
@@ -26,31 +27,49 @@ export const mpesaCallback = async (req, res) => {
     }
 
     // ✅ SUCCESSFUL PAYMENT
-    const metadata = callback.CallbackMetadata.Item;
+    if (resultCode === 0) {
+        const metadata = callback.CallbackMetadata.Item;
 
-    const data = {};
+        const data = {};
+        metadata.forEach((item) => {
+            data[item.Name] = item.Value;
+        });
 
-    metadata.forEach((item) => {
-      data[item.Name] = item.Value;
-    });
+        const transaction = await Transaction.create({
+            amount: data.Amount,
+            phone: data.PhoneNumber,
+            mpesaReceiptNumber: data.MpesaReceiptNumber,
+            transactionDate: data.TransactionDate,
+            status: "success",
+        });
 
-    const transaction = {
-      amount: data.Amount,
-      mpesaReceiptNumber: data.MpesaReceiptNumber,
-      phone: data.PhoneNumber,
-      transactionDate: data.TransactionDate,
-    };
-
-    console.log("✅ PAYMENT SUCCESS:", transaction);
-
-
-    //save to database if needed
+        console.log("Saved:", transaction);
+        return res.json({ message: "Callback received" });
+    }   
     
-
-    res.json({ message: "Callback processed successfully" });
 
   } catch (error) {
     console.error("CALLBACK ERROR:", error);
     res.status(500).json({ message: "Callback error" });
+  }
+};
+
+// 📜 Get all transactions
+export const getTransactions = async (req, res) => {
+  try {
+    const transactions = await Transaction.find().sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: transactions.length,
+      data: transactions,
+    });
+  } catch (error) {
+    console.error("GET TRANSACTIONS ERROR:", error.message);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch transactions",
+    });
   }
 };
