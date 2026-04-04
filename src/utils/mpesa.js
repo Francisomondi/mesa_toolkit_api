@@ -53,7 +53,7 @@ export const stkPush = async ({ phone, amount }) => {
         PartyA: formatPhone(phone),
         PartyB: process.env.SHORTCODE,
         PhoneNumber: formatPhone(phone),
-        CallBackURL: process.env.CALLBACK_URL,
+        CallBackURL: process.env.MPESA_CALLBACK_URL,
         AccountReference: "mpesaToolkit",
         TransactionDesc: "Mpesa Toolkit Payment",
       },
@@ -71,3 +71,4 @@ export const stkPush = async ({ phone, amount }) => {
     throw error;
   }
 };
+
