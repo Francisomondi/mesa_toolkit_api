@@ -73,3 +73,27 @@ export const getTransactions = async (req, res) => {
     });
   }
 };
+
+// 📱 Get transactions by phone
+export const getTransactionsByPhone = async (req, res) => {
+  try {
+    const { phone } = req.params;
+
+    const transactions = await Transaction.find({ phone })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: transactions.length,
+      data: transactions,
+    });
+
+  } catch (error) {
+    console.error("GET BY PHONE ERROR:", error.message);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch user transactions",
+    });
+  }
+};
