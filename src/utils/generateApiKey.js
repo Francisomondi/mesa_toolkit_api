@@ -1,5 +1,5 @@
 import crypto from "crypto";
 
 export const generateApiKey = () => {
-  return "live_" + crypto.randomBytes(24).toString("hex");
+  return "live_" + crypto.randomBytes(32).toString("hex");
 };

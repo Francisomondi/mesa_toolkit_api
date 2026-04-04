@@ -79,7 +79,7 @@ export const getTransactionsByPhone = async (req, res) => {
   try {
     const { phone } = req.params;
 
-    const transactions = await Transaction.find({ phone })
+    const transactions = await Transaction.find({ phone, user: req.user._id })
       .sort({ createdAt: -1 });
 
     res.status(200).json({
